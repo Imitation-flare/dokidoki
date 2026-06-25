@@ -208,12 +208,13 @@ async def join(interaction: discord.Interaction):
     if not interaction.user.voice:
         await interaction.response.send_message("❌ VCに入ってから使って", ephemeral=True)
         return
+    await interaction.response.defer()
     channel = interaction.user.voice.channel
     if interaction.guild.voice_client:
         await interaction.guild.voice_client.move_to(channel)
     else:
         await channel.connect()
-    await interaction.response.send_message(f"✅ `{channel.name}` に参加したよ")
+    await interaction.followup.send(f"✅ `{channel.name}` に参加したよ")
 
 @bot.tree.command(name="kill", description="VCから離脱します")
 async def kill(interaction: discord.Interaction):
@@ -221,11 +222,12 @@ async def kill(interaction: discord.Interaction):
     if not vc:
         await interaction.response.send_message("❌ VCにいないよ", ephemeral=True)
         return
+    await interaction.response.defer()
     player = get_player(interaction.guild.id)
     player.queue.clear()
     player.current = None
     await vc.disconnect()
-    await interaction.response.send_message("👋 切断したよ")
+    await interaction.followup.send("👋 切断したよ")
 
 @bot.tree.command(name="play", description="曲を再生します（URL or 検索ワード）")
 @app_commands.describe(query="URLまたは曲名")
